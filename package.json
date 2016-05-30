@@ -1,13 +1,10 @@
 {
-  "name": "r6-esl-parser",
+  "name": "r6_esl_parser",
   "version": "1.0.0",
-  "description": "",
+  "description": "Parse Teams & Members of Rainbow Six ESL Events",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "author": "Jake0oo0 <support@r6stats.com>",
+  "license": "MIT",
   "dependencies": {
     "cheerio": "^0.20.0",
     "request": "^2.72.0"
