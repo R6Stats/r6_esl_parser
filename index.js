@@ -1,7 +1,22 @@
 var request = require('request');
 var cheerio = require('cheerio');
+var argv = require('yargs')
+	.usage("Usage: $0 <url> <platform>")
+	.demand(2)
+	.argv;
 
-var resultsURL = "http://play.eslgaming.com/rainbowsix/north-america-pc/r6siege/major/5on5-pro-league-season-2-north-america/results/";
+var args = argv._;
+var resultsURL = args[0];
+
+var platform = args[1];
+
+var platforms = ['xone', 'uplay'];
+
+if (platforms.indexOf(platform) == -1) {
+	console.warn("Invalid Platform.")
+	process.exit(1);
+}
+
 var base = "http://play.eslgaming.com";
 
 var teamMembers = [];
@@ -84,11 +99,11 @@ function getMatches() {
 						var members = team.members;
 						var name = team.name;
 
-						rp += "**" + name + "**\n\n";
+						rp += "**" + name + ":**\n\n";
 
 						for (var m in members) {
 							var member = members[m];
-							rp += "[" + member.esl + "](https://r6stats.com/stats/uplay/" + member.username +")\n\n";
+							rp += "[" + member.esl + "](https://r6stats.com/stats/" + platform + "/" + encodeURIComponent(member.username) +")\n\n";
 						}
 
 					}
@@ -107,6 +122,14 @@ function getMatches() {
 function getMembers(data, report) {
 	var name = data.name;
 	var link = data.link;
+	var psub;
+
+	if (platform === 'uplay') {
+		psub = 'Uplay Nick'
+	} else if (platform === 'xone') {
+		psub = 'Xbox Live Gamertag'
+	}
+	psub = psub += ':'
 
 	request(base + link, function(err, res, body) {
 		if (err) return;
@@ -115,7 +138,7 @@ function getMembers(data, report) {
 		var rows = $(".esl-content table").first().children().filter("[bgcolor='#E3E0DD'],[bgcolor='#F5F4F3']");
 		var members = [];
 		rows.each(function(i,e) {
-			var platformName = $(e).find("div:contains('Uplay Nick')").clone().children().remove().end().text().replace('Uplay Nick:', '').trim();
+			var platformName = $(e).find("div:contains('" + psub + "')").clone().children().remove().end().text().replace(psub, '').trim();
 			var eslName = $(e).find("b").text();
 			members.push({esl: eslName, username: platformName});
 		});
